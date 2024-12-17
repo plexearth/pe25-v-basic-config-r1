@@ -2,7 +2,59 @@
   "sysStrings": {
     "URL_ON_SIGN_IN_WELCOME_IMAGE": "[$URL_ROOT_CDN]/campaigns/001-signin-welcome/image.jpg",
     "URL_ON_SIGN_IN_WELCOME_GOTO_LEARN": "[$URL_PAGE_WELCOME_LEARNMORE]?utm_source=[$HOST_PLATFORM_REF]-[$PROD_REF]&utm_medium=in_app_message&utm_term=welcome_message&utm_campaign=onboarding",
-    "URL_ON_SWITCH_TO_PRO_IMAGE": "[$URL_ROOT_CDN]/campaigns/005-upgrade-to-pro/image.jpg"
+    "URL_ON_SWITCH_TO_LITE_IMAGE": "[$URL_ROOT_CDN]/campaigns/005-switch-to-lite/image.jpg",
+    "URL_ON_SIGN_IN_EXPIRES_SOON_TRIAL_IMAGE": "[$URL_ROOT_CDN]/campaigns/004-expired-trial/image.jpg",
+    "URL_ON_SIGN_IN_EXPIRES_SOON_TRIAL_PRICING": "[$URL_PAGE_PRICING]?utm_source=[$HOST_PLATFORM_REF]-[$PROD_REF]&utm_medium=in_app_message&utm_term=on_trial_expired&utm_campaign=upgrade&wky=[$wky]",
+    "URL_ON_SIGN_IN_EXPIRES_SOON_TRIAL_CONTACT": "[$URL_PAGE_CONTACT_SALES]?utm_source=[$HOST_PLATFORM_REF]-[$PROD_REF]&utm_medium=in_app_message&utm_term=on_trial_expired&utm_campaign=upgrade&wky=[$wky]"
+  },
+  "sysSelections": {
+    "DAYS_TO_EXPIRE_TEXT": {
+      "resDefault": "soon",
+      "statements": [
+        {
+          "type": "if",
+          "condSet": {
+            "conditions": [
+              {
+                "type": "double",
+                "operator": ">=",
+                "value": "[var:[DAYS_TO_EXPIRE]]",
+                "compareTo": "2"
+              }
+            ]
+          },
+          "result": "in [var:[DAYS_TO_EXPIRE]] days"
+        },
+        {
+          "type": "if",
+          "condSet": {
+            "conditions": [
+              {
+                "type": "double",
+                "operator": "==",
+                "value": "[var:[DAYS_TO_EXPIRE]]",
+                "compareTo": "1"
+              }
+            ]
+          },
+          "result": "tomorrow"
+        },
+        {
+          "type": "if",
+          "condSet": {
+            "conditions": [
+              {
+                "type": "double",
+                "operator": "==",
+                "value": "[var:[DAYS_TO_EXPIRE]]",
+                "compareTo": "0"
+              }
+            ]
+          },
+          "result": "today"
+        }
+      ]
+    }
   },
   "sysCampaigns": {
     "ON_SIGN_IN_WELCOME": {
@@ -18,58 +70,15 @@
         }
       ]
     },
-    "ON_LITE_SWITCH_TO_PRO": {
+    "ON_SWITCH_TO_LITE": {
       "isEnabled": "true",
       "entryItems": [
         {
           "isEnabled": "true",
           "action": {
             "type": "gotoNotif",
-            "notifId": "ON_LITE_SWITCH_TO_PRO",
+            "notifId": "ON_SWITCH_TO_LITE",
             "isEnabled": "true"
-          }
-        }
-      ]
-    },
-    "ON_COMMAND_DENY": {
-      "isEnabled": "true",
-      "entryItems": [
-        {
-          "isEnabled": "true",
-          "action": {
-            "type": "gotoNotif",
-            "notifId": "ON_COMMAND_DENY",
-            "isEnabled": "true"
-          }
-        }
-      ]
-    },
-    "ON_PRINT_DENY": {
-      "isEnabled": "true",
-      "entryItems": [
-        {
-          "isEnabled": "[tag:[Sta.Settings.UX.ShowPrintDenyMessage]] ?? true",
-          "action": {
-            "type": "gotoNotif",
-            "notifId": "ON_PRINT_DENY",
-            "isEnabled": "true"
-          }
-        }
-      ]
-    },
-    "ON_PRINT": {
-      "isEnabled": "true",
-      "entryItems": [
-        {
-          "isEnabled": "true",
-          "action": {
-            "type": "basic",
-            "isEnabled": "true",
-            "setData": {
-              "resources": {
-                "UX.Client.PrintCommandUsage": "1"
-              }
-            }
           }
         }
       ]
@@ -79,7 +88,7 @@
     "ON_SIGN_IN_WELCOME": {
       "type": "dialog",
       "isModal": "true",
-      "content": "<Grid VerticalAlignment='Center' MaxWidth='900'><TextBlock><Image Width='900' Source='[$string:URL_ON_SIGN_IN_WELCOME_IMAGE]'/></TextBlock><StackPanel><DockPanel Margin='24'><DockPanel.Background><SolidColorBrush Color='#101010' Opacity='0.9'/></DockPanel.Background><StackPanel Margin='24'><TextBlock Style='{DynamicResource H1}' Foreground='#FFF' TextWrapping='Wrap'>Welcome to the new Plex-Earth Lite!</TextBlock><TextBlock Style='{DynamicResource H3}' Foreground='#FFF' TextWrapping='Wrap'>Get the best view of your project area.</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF'><Hyperlink Foreground='#DD6B45' NavigateUri='action:gotoLearn'>Click here to learn more</Hyperlink></TextBlock></StackPanel></DockPanel></StackPanel></Grid>",
+      "content": "<Grid VerticalAlignment='Center' MaxWidth='900'><TextBlock><Image Width='900' Source='[$string:URL_ON_SIGN_IN_WELCOME_IMAGE]'/></TextBlock><StackPanel><DockPanel Margin='24'><DockPanel.Background><SolidColorBrush Color='#101010' Opacity='0.9'/></DockPanel.Background><StackPanel Margin='24'><TextBlock Style='{DynamicResource H1}' Foreground='#FFF' TextWrapping='Wrap'>Welcome to Plex-Earth Basic!</TextBlock><TextBlock Style='{DynamicResource H3}' Foreground='#FFF' TextWrapping='Wrap'>Get the best view of your project area.</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF'><Hyperlink Foreground='#DD6B45' NavigateUri='action:gotoLearn'>Click here to learn more</Hyperlink></TextBlock></StackPanel></DockPanel></StackPanel></Grid>",
       "btnOnEsc": "left",
       "btnOnEnter": "left",
       "btnLeft": {
@@ -101,14 +110,14 @@
       "hasCbx": "true",
       "cbxText": "Don't show again",
       "onCbxSelected": {
-        "type": "gotoNotif",
+        "type": "basic",
         "setData": {
           "tags": {
             "Sta.Settings.UX.ShowWelcome": "false"
           }
         }
       },
-      "title": "Welcome to the new Plex-Earth Lite!",
+      "title": "Welcome to Plex-Earth Basic 2025",
       "namedActions": {
         "gotoLearn": {
           "type": "gotoUrl",
@@ -116,42 +125,31 @@
         }
       }
     },
-    "ON_LITE_SWITCH_TO_PRO": {
+    "ON_SWITCH_TO_LITE": {
       "type": "dialog",
       "isModal": "true",
-      "content": "<Grid VerticalAlignment='Center' MaxWidth='900'><TextBlock><Image Width='900' Source='[$string:URL_ON_SWITCH_TO_PRO_IMAGE]'/></TextBlock><StackPanel><DockPanel Margin='24'><DockPanel.Background><SolidColorBrush Color='#101010' Opacity='0.9'/></DockPanel.Background><StackPanel Margin='24'><TextBlock Style='{DynamicResource H1}' Foreground='#FFF' TextWrapping='Wrap'>Upgrade to Pro Now!</TextBlock><TextBlock Style='{DynamicResource H3}' Foreground='#FFF' TextWrapping='Wrap'>Get the fully fledged Plex-Earth  view of your project area.</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF'><Hyperlink Foreground='#DD6B45' NavigateUri='[$URL_PAGE_CONTACT_SUPPORT]'>Contact Support Team for more info</Hyperlink></TextBlock></StackPanel></DockPanel></StackPanel></Grid>",
+      "content": "<Grid VerticalAlignment='Center' MaxWidth='900'><TextBlock><Image Width='900' Source='[$string:URL_ON_SWITCH_TO_LITE_IMAGE]'/></TextBlock><StackPanel><DockPanel Margin='24'><DockPanel.Background><SolidColorBrush Color='#101010' Opacity='0.9'/></DockPanel.Background><StackPanel Margin='24'><TextBlock Style='{DynamicResource H1}' Foreground='#FFF' TextWrapping='Wrap'>Switch to Lite</TextBlock><TextBlock Style='{DynamicResource H3}' Foreground='#FFF' TextWrapping='Wrap'>Get Plex-Earth's free edition.</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF'><Hyperlink Foreground='#DD6B45' NavigateUri='[$URL_PAGE_CONTACT_SUPPORT]'>Contact Support Team for more info</Hyperlink></TextBlock></StackPanel></DockPanel></StackPanel></Grid>",
       "btnLeft": {
         "text": "Close",
         "dlgRes": "false"
       },
       "btnRight": {
-        "text": "Start a Free Trial",
-        "backClr": "#DD6B45",
+        "text": "Switch",
+        "backClr": "#000",
         "foreClr": "#FFF",
         "action": {
           "type": "custom",
-          "customData": "{\"type\":\"switchEdition\",\"target\":\"PRO\",\"migrationConfig\":{\"appId\":\"0B3E489B9D934658940142574687A002\",\"appName\":\"Plex-Earth Pro\",\"planId\":\"5892A0F6072E44EDA9517D68817FD74B\",\"planName\":\"Plex-Earth Free Trial\"}}"
-        },
-        "dlgRes": "true",
-        "runAfterDlg": "true"
-      },
-      "btnAction": {
-        "text": "I already have a subscription",
-        "backClr": "#F5F5F5",
-        "foreClr": "#101010",
-        "action": {
-          "type": "custom",
-          "customData": "{\"type\":\"switchEdition\",\"target\":\"PRO\"}"
+          "customData": "{\"type\":\"switchEdition\",\"target\":\"LITE\",\"migrationConfig\":{\"appId\":\"50CD86C9373F4CC4A79B59D7AFEB145B\",\"appName\":\"Plex-Earth Lite\",\"planId\":\"DB1AF7B4B52A4287BB84A45EF5C047D8\",\"planName\":\"Plex-Earth Lite\"}}"
         },
         "dlgRes": "true",
         "runAfterDlg": "true"
       },
       "title": "Upgrade to Pro!"
     },
-    "ON_COMMAND_DENY": {
+    "ON_CONSUMABLES_CREDITS_LIMIT_REACHED": {
       "type": "dialog",
       "isModal": "true",
-      "content": "<Grid VerticalAlignment='Center' MaxWidth='900'><TextBlock><Image Width='900' Source=''/></TextBlock><StackPanel><DockPanel Margin='24'><DockPanel.Background><SolidColorBrush Color='#101010' Opacity='0.9'/></DockPanel.Background><StackPanel Margin='24'><TextBlock Style='{DynamicResource H2}' Foreground='#FFF' TextWrapping='Wrap'>Upgrade to Plex-Earth Pro Now!</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF' TextWrapping='Wrap'>Get the perfect view of your project area.</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF'><Hyperlink Foreground='#DD6B45' NavigateUri='[$URL_PAGE_CONTACT_SUPPORT]'>Contact Support Team for more info</Hyperlink></TextBlock></StackPanel></DockPanel></StackPanel></Grid>",
+      "content": "<Grid VerticalAlignment='Center' MaxWidth='900'><TextBlock><Image Width='900' Source=''/></TextBlock><StackPanel><DockPanel Margin='24'><DockPanel.Background><SolidColorBrush Color='#101010' Opacity='0.9'/></DockPanel.Background><StackPanel Margin='24'><TextBlock Style='{DynamicResource H2}' Foreground='#FFF' TextWrapping='Wrap'>You reached the Credits limit in your account.</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF' TextWrapping='Wrap'>Get the best view of your project area.</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF'><Hyperlink Foreground='#DD6B45' NavigateUri='[$URL_PAGE_CONTACT_SUPPORT]'>Contact Support Team for more info</Hyperlink></TextBlock></StackPanel></DockPanel></StackPanel></Grid>",
       "btnLeft": {
         "text": "Close",
         "dlgRes": "false"
@@ -165,48 +163,75 @@
           "url": "[$string:[$EMAIL_SUPPORT]]"
         }
       },
-      "title": "Unavailable Command!"
+      "title": "Images Limit Reached"
     },
-    "ON_PRINT_DENY": {
+    "ON_CONSUMABLES_IMAGES_LIMIT_REACHED": {
       "type": "dialog",
       "isModal": "true",
-      "content": "<Grid VerticalAlignment='Center' MaxWidth='900'><TextBlock><Image Width='900' Source=''/></TextBlock><StackPanel><DockPanel Margin='24'><DockPanel.Background><SolidColorBrush Color='#101010' Opacity='0.9'/></DockPanel.Background><StackPanel Margin='24'><TextBlock Style='{DynamicResource H2}' Foreground='#FFF' TextWrapping='Wrap'>Plex-Earth elements won’t be printed.</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF' TextWrapping='Wrap'>Upgrade to Pro to print your drawing with all Plex-Earth terrain and imagery, and unlock advanced tools for data export and management.</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF'><Hyperlink Foreground='#DD6B45' NavigateUri='action:contactSupport'>Questions? Contact our Support Team</Hyperlink></TextBlock></StackPanel></DockPanel></StackPanel></Grid>",
+      "content": "<Grid VerticalAlignment='Center' MaxWidth='900'><TextBlock><Image Width='900' Source=''/></TextBlock><StackPanel><DockPanel Margin='24'><DockPanel.Background><SolidColorBrush Color='#101010' Opacity='0.9'/></DockPanel.Background><StackPanel Margin='24'><TextBlock Style='{DynamicResource H2}' Foreground='#FFF' TextWrapping='Wrap'>You reached the consumable Images limit in your account.</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF' TextWrapping='Wrap'>Get the best view of your project area.</TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF'><Hyperlink Foreground='#DD6B45' NavigateUri='[$URL_PAGE_CONTACT_SUPPORT]'>Contact Support Team for more info</Hyperlink></TextBlock></StackPanel></DockPanel></StackPanel></Grid>",
       "btnLeft": {
-        "text": "Upgrade to Pro!",
-        "action": {
-          "type": "gotoUrl",
-          "url": "[$URL_PAGE_UPGRADE]?utm_source=[$HOST_PLATFORM_REF]-[$PROD_REF]&utm_medium=in_app_message&utm_term=on_print_deny&utm_campaign=upgrade&wky=[$wky]"
-        }
-      },
-      "btnRight": {
-        "text": "Print without elements",
+        "text": "Close",
         "dlgRes": "false"
       },
-      "hasCbx": "true",
-      "cbxText": "Don't show again",
-      "onCbxSelected": {
-        "type": "gotoNotif",
-        "setData": {
-          "tags": {
-            "Sta.Settings.UX.ShowPrintDenyMessage": "false"
-          }
-        }
-      },
-      "title": "Plex-Earth elements won’t be printed",
-      "onShow": {
-        "type": "basic",
-        "setData": {
-          "resources": {
-            "UX.Client.PrintDenyMessages": "1"
-          }
-        }
-      },
-      "namedActions": {
-        "contactSupport": {
+      "btnRight": {
+        "text": "Contact us!",
+        "backClr": "#000",
+        "foreClr": "#FFF",
+        "action": {
           "type": "gotoUrl",
-          "url": "[$URL_PAGE_CONTACT_SUPPORT]?utm_source=[$HOST_PLATFORM_REF]-[$PROD_REF]&utm_medium=in_app_message&utm_term=on_print_deny&utm_campaign=upgrade"
+          "url": "[$string:[$EMAIL_SUPPORT]]"
+        }
+      },
+      "title": "Images Limit Reached"
+    },
+    "ON_TRIAL_EXPIRES_SOON": {
+      "type": "dialog",
+      "isModal": "true",
+      "content": "<Grid VerticalAlignment='Center' MaxWidth='900'><TextBlock><Image Width='900' Source='[$string:URL_ON_SIGN_IN_EXPIRES_SOON_TRIAL_IMAGE]'/></TextBlock><StackPanel><DockPanel Margin='24'><DockPanel.Background><SolidColorBrush Color='#101010' Opacity='0.9'/></DockPanel.Background><StackPanel Margin='24'><TextBlock Style='{DynamicResource H1}' Foreground='#FFF' TextWrapping='Wrap'>Your Plex-Earth free trial expires [select:[DAYS_TO_EXPIRE_TEXT]]!</TextBlock><TextBlock Style='{DynamicResource H3}' Foreground='#FFF' TextWrapping='Wrap'>Come to Plex-Earth world - Design for the real world!<LineBreak/>Upgrade your free trial to a subscription today<LineBreak/>and change the way you design forever.</TextBlock></TextBlock><TextBlock Style='{DynamicResource H4}' Foreground='#FFF'><Hyperlink Foreground='#DD6B45' NavigateUri='action:gotoPricing'>See your upgrade options!</Hyperlink></TextBlock></StackPanel></DockPanel></StackPanel></Grid>",
+      "btnLeft": {
+        "text": "Maybe later",
+        "dlgRes": "true"
+      },
+      "btnRight": {
+        "text": "See pricing!",
+        "backClr": "#000",
+        "foreClr": "#FFF",
+        "action": {
+          "type": "gotoUrl",
+          "url": "[$string:URL_ON_SIGN_IN_EXPIRES_SOON_TRIAL_PRICING]"
+        }
+      },
+      "btnAction": {
+        "text": "Contact our sales team",
+        "action": {
+          "type": "gotoUrl",
+          "url": "[$string:URL_ON_SIGN_IN_EXPIRES_SOON_TRIAL_CONTACT]"
+        }
+      },
+      "btnWinClose": {
+        "dlgRes": "true"
+      },
+      "title": "Your free trial expires soon",
+      "namedActions": {
+        "gotoPricing": {
+          "type": "gotoUrl",
+          "url": "[$string:URL_ON_SIGN_IN_EXPIRES_SOON_TRIAL_PRICING]"
         }
       }
+    },
+    "ON_WIN_CLOSE_BUTTON": {
+      "type": "dialog",
+      "isModal": "true",
+      "content": "<Grid VerticalAlignment='Center' MaxWidth='900'><TextBlock><Image Width='900' Source=''/></TextBlock><StackPanel><DockPanel Margin='8'><DockPanel.Background><SolidColorBrush Color='#101010' Opacity='0.9'/></DockPanel.Background><StackPanel Margin='24'><TextBlock Style='{DynamicResource H4}' Foreground='#FFF'><Hyperlink Foreground='#DD6B45' NavigateUri=''></Hyperlink></TextBlock></StackPanel></DockPanel></StackPanel></Grid>",
+      "btnLeft": {
+        "text": "Yes",
+        "dlgRes": "true"
+      },
+      "btnRight": {
+        "text": "No",
+        "dlgRes": "false"
+      },
+      "title": "Confirm"
     }
   }
 }
